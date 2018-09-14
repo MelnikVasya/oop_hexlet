@@ -1,13 +1,14 @@
 require 'uri'
 require 'net/http'
-require 'ox'
+require 'json'
 
 require 'oop_hexlet/version'
 
 module OopHexlet
-  URL = 'http://ipgeobase.ru:7020/geo'.freeze
-  IpInformation = Struct.new(:inetnum, :country, :city, :region, :district,
-                             :lat, :lng)
+  URL = 'http://ip-api.com/json/'.freeze
+  IpInformation = Struct.new(:as, :city, :country, :zip, :country_code, :isp,
+                             :lat, :lon, :org, :region, :region_name, :status,
+                             :timezone)
 
   class << self
     def search(ip)
@@ -18,18 +19,16 @@ module OopHexlet
     private
 
     def get_response(ip)
-      uri = URI(URL)
-      uri.query = URI.encode_www_form(ip: ip)
+      uri = URI.join(URL, ip)
       Net::HTTP.get_response(uri)
     end
 
     def parse(response)
-      body = response.body.force_encoding('windows-1251').encode('utf-8')
-      info = Ox.load(body, mode: :hash_no_attrs).dig(:"ip-answer", :ip) || {}
-
-      IpInformation.new(info[:inetnum], info[:country], info[:city],
-                        info[:region], info[:district],
-                        info[:lat]&.to_f, info[:lng]&.to_f)
+      info = JSON.parse(response.body)
+      IpInformation.new(info['as'], info['city'], info['country'], info['zip'],
+                        info['countryCode'], info['isp'], info['lat'],
+                        info['lon'], info['org'], info['region'],
+                        info['regionName'], info['status'], info['timezone'])
     end
   end
 end
