@@ -13,6 +13,13 @@ RSpec.describe OopHexlet do
           "timezone":"Europe/Warsaw","zip":"1223"}
         BODY
       )
+
+      stub_request(:get, "http://ip-api.com/json/invalid_query").to_return(
+        status: 200,
+        body: <<-BODY
+          {"message":"invalid query","query":"invalid_query","status":"fail"}
+        BODY
+      )
     end
 
     context 'succes response' do
@@ -25,6 +32,20 @@ RSpec.describe OopHexlet do
       it { expect(geolocation.lon).to eq(21.0122) }
       it { expect(geolocation.org).to eq('Google') }
       it { expect(geolocation.status).to eq('success') }
+      it { expect(geolocation.message).to eq(nil) }
+    end
+
+    context 'invalid query' do
+      subject(:geolocation) { OopHexlet.search_geolocation('invalid_query') }
+
+      it { expect(geolocation.city).to eq(nil) }
+      it { expect(geolocation.country).to eq(nil) }
+      it { expect(geolocation.zip).to eq(nil) }
+      it { expect(geolocation.lat).to eq(nil) }
+      it { expect(geolocation.lon).to eq(nil) }
+      it { expect(geolocation.org).to eq(nil) }
+      it { expect(geolocation.status).to eq('fail') }
+      it { expect(geolocation.message).to eq('invalid query') }
     end
   end
 end
