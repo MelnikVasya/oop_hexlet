@@ -5,21 +5,21 @@ require 'json'
 require 'oop_hexlet/version'
 
 module OopHexlet
-  URL = 'http://ip-api.com/json/'.freeze
+  URL = 'http://ip-api.com/json/'
   Geolocation = Struct.new(:city, :country, :zip, :lat, :lon, :org, :status,
                            :message)
 
   class << self
-    def search_geolocation(ip)
-      response = get_response(ip)
+    def search_geolocation(ip, http_client = Net::HTTP)
+      response = get_response(ip, http_client)
       parse(response)
     end
 
     private
 
-    def get_response(ip)
+    def get_response(ip, http_client)
       uri = URI.join(URL, ip)
-      Net::HTTP.get_response(uri)
+      http_client.get_response(uri)
     end
 
     def parse(response)

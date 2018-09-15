@@ -2,28 +2,27 @@ require 'spec_helper'
 
 RSpec.describe OopHexlet do
   describe '.search_geolocation' do
-    before do
-      stub_request(:get, 'http://ip-api.com/json/172.217.20.174').to_return(
-        status: 200,
-        body: <<-BODY
-          {"as":"AS15169 Google LLC","city":"Warsaw","country":"Poland",
-          "countryCode":"PL","isp":"Google","lat":52.2297,"lon":21.0122,
-          "org":"Google","query":"172.217.20.174","region":"MZ",
-          "regionName":"Masovian Voivodeship","status":"success",
-          "timezone":"Europe/Warsaw","zip":"1223"}
-        BODY
-      )
-
-      stub_request(:get, "http://ip-api.com/json/invalid_query").to_return(
-        status: 200,
-        body: <<-BODY
-          {"message":"invalid query","query":"invalid_query","status":"fail"}
-        BODY
-      )
-    end
-
     context 'succes response' do
-      subject(:geolocation) { OopHexlet.search_geolocation('172.217.20.174') }
+      before do
+        succes_response = double('succes_body')
+        @http_client = double('http_client')
+
+        allow(succes_response).to receive(:body) do
+          <<-BODY
+            {"as":"AS15169 Google LLC","city":"Warsaw","country":"Poland",
+            "countryCode":"PL","isp":"Google","lat":52.2297,"lon":21.0122,
+            "org":"Google","query":"172.217.20.174","region":"MZ",
+            "regionName":"Masovian Voivodeship","status":"success",
+            "timezone":"Europe/Warsaw","zip":"1223"}
+          BODY
+        end
+
+        allow(@http_client).to receive(:get_response) { succes_response }
+      end
+
+      subject(:geolocation) do
+        OopHexlet.search_geolocation('172.217.20.174', @http_client)
+      end
 
       it { expect(geolocation.city).to eq('Warsaw') }
       it { expect(geolocation.country).to eq('Poland') }
@@ -36,7 +35,22 @@ RSpec.describe OopHexlet do
     end
 
     context 'invalid query' do
-      subject(:geolocation) { OopHexlet.search_geolocation('invalid_query') }
+      before do
+        @http_client = double('http_client')
+        fail_response = double('succes_body')
+
+        allow(fail_response).to receive(:body) do
+          <<-BODY
+            {"message":"invalid query","query":"invalid_query","status":"fail"}
+          BODY
+        end
+
+        allow(@http_client).to receive(:get_response) { fail_response }
+      end
+
+      subject(:geolocation) do
+        OopHexlet.search_geolocation('invalid_query', @http_client)
+      end
 
       it { expect(geolocation.city).to eq(nil) }
       it { expect(geolocation.country).to eq(nil) }
