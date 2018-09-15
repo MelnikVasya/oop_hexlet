@@ -1,9 +1,3 @@
-# OopHexlet
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/oop_hexlet`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -21,8 +15,16 @@ Or install it yourself as:
     $ gem install oop_hexlet
 
 ## Usage
-
-TODO: Write usage instructions here
+```ruby
+  geolocation = OopHexlet.search_geolocation('172.217.20.174')
+  geolocation.city # => 'Warsaw'
+  geolocation.country # => 'Poland'
+  geolocation.zip # => '1223
+  geolocation.lat # => 52.2297
+  geolocation.lon # => 21.0122
+  geolocation.org # => 'Google'
+  geolocation.status # => 'success'
+```
 
 ## Development
 
