@@ -6,12 +6,12 @@ require 'oop_hexlet/version'
 
 module OopHexlet
   URL = 'http://ip-api.com/json/'.freeze
-  IpInformation = Struct.new(:as, :city, :country, :zip, :country_code, :isp,
-                             :lat, :lon, :org, :region, :region_name, :status,
-                             :timezone)
+  Geolocation = Struct.new(:as, :city, :country, :zip, :country_code, :isp,
+                           :lat, :lon, :org, :region, :region_name, :status,
+                           :timezone)
 
   class << self
-    def search(ip)
+    def search_geolocation(ip)
       response = get_response(ip)
       parse(response)
     end
@@ -25,10 +25,10 @@ module OopHexlet
 
     def parse(response)
       info = JSON.parse(response.body)
-      IpInformation.new(info['as'], info['city'], info['country'], info['zip'],
-                        info['countryCode'], info['isp'], info['lat'],
-                        info['lon'], info['org'], info['region'],
-                        info['regionName'], info['status'], info['timezone'])
+      Geolocation.new(info['as'], info['city'], info['country'], info['zip'],
+                      info['countryCode'], info['isp'], info['lat'],
+                      info['lon'], info['org'], info['region'],
+                      info['regionName'], info['status'], info['timezone'])
     end
   end
 end

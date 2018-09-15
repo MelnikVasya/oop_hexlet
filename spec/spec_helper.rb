@@ -1,4 +1,5 @@
 require 'bundler/setup'
+require 'webmock/rspec'
 require 'oop_hexlet'
 
 RSpec.configure do |config|
