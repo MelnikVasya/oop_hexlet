@@ -21,23 +21,24 @@ RSpec.describe OopHexlet do
       end
 
       subject(:geolocation) do
-        OopHexlet.search_geolocation('172.217.20.174', @http_client)
+        geo_ip = OopHexlet::GeoIp.new(http_client: @http_client)
+        geo_ip.load_geolocation('172.217.20.174')
       end
 
-      it { expect(geolocation.city).to eq('Warsaw') }
-      it { expect(geolocation.country).to eq('Poland') }
-      it { expect(geolocation.zip).to eq('1223') }
-      it { expect(geolocation.lat).to eq(52.2297) }
-      it { expect(geolocation.lon).to eq(21.0122) }
-      it { expect(geolocation.org).to eq('Google') }
-      it { expect(geolocation.status).to eq('success') }
-      it { expect(geolocation.message).to eq(nil) }
+      it { expect(geolocation[:city]).to eq('Warsaw') }
+      it { expect(geolocation[:country]).to eq('Poland') }
+      it { expect(geolocation[:zip]).to eq('1223') }
+      it { expect(geolocation[:lat]).to eq(52.2297) }
+      it { expect(geolocation[:lon]).to eq(21.0122) }
+      it { expect(geolocation[:org]).to eq('Google') }
+      it { expect(geolocation[:status]).to eq('success') }
+      it { expect(geolocation[:message]).to eq(nil) }
     end
 
     context 'invalid query' do
       before do
         @http_client = double('http_client')
-        fail_response = double('succes_body')
+        fail_response = double('fail_response')
 
         allow(fail_response).to receive(:body) do
           <<-BODY
@@ -49,17 +50,18 @@ RSpec.describe OopHexlet do
       end
 
       subject(:geolocation) do
-        OopHexlet.search_geolocation('invalid_query', @http_client)
+        geo_ip = OopHexlet::GeoIp.new(http_client: @http_client)
+        geo_ip.load_geolocation('invalid_query')
       end
 
-      it { expect(geolocation.city).to eq(nil) }
-      it { expect(geolocation.country).to eq(nil) }
-      it { expect(geolocation.zip).to eq(nil) }
-      it { expect(geolocation.lat).to eq(nil) }
-      it { expect(geolocation.lon).to eq(nil) }
-      it { expect(geolocation.org).to eq(nil) }
-      it { expect(geolocation.status).to eq('fail') }
-      it { expect(geolocation.message).to eq('invalid query') }
+      it { expect(geolocation[:city]).to eq(nil) }
+      it { expect(geolocation[:country]).to eq(nil) }
+      it { expect(geolocation[:zip]).to eq(nil) }
+      it { expect(geolocation[:lat]).to eq(nil) }
+      it { expect(geolocation[:lon]).to eq(nil) }
+      it { expect(geolocation[:org]).to eq(nil) }
+      it { expect(geolocation[:status]).to eq('fail') }
+      it { expect(geolocation[:message]).to eq('invalid query') }
     end
   end
 end

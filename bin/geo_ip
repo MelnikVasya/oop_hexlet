@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+require 'bundler/setup'
+require 'oop_hexlet'
+
+ip = ARGV[0]
+geo_ip = OopHexlet::GeoIp.new
+geolocation = geo_ip.load_geolocation(ip)
+puts geolocation
